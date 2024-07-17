@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up / Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000; /* Dark black background */
+            color: #fff;
+        }
+        .container {
+            width: 400px;
+            padding: 20px;
+            background-color: #1c1c1c; /* Slightly lighter black for the form */
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .form-container {
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #333;
+            color: #fff;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .toggle-button, .auth-button {
+            background-color: transparent;
+            color: #007bff;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 10px;
+        }
+        .form-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .terms-container {
+            text-align: left;
+        }
+        .terms-container a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .terms-container a:hover {
+            text-decoration: underline;
+        }
+        .auth-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Signup Form -->
+    <div id="signupForm" class="form-container active">
+        <h2 class="form-title">Sign Up</h2>
+        <form id="signupFormContent" action="/signup" method="post">
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            <input type="text" id="fname" name="fname" placeholder="First Name" required>
+            <input type="text" id="lname" name="lname" placeholder="Last Name" required>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+            <div class="terms-container">
+                <label>
+                    <input type="checkbox" id="terms" name="terms" required>
+                    I agree to the <a href="terms.html" target="_blank">Terms and Conditions</a>
+                </label>
+            </div>
+            <input type="submit" value="Sign Up">
+        </form>
+        <button class="toggle-button" id="toLoginBtn">Already have an account? Log In</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm" class="form-container">
+        <h2 class="form-title">Log In</h2>
+        <form id="loginFormContent" action="/login" method="post">
+            <input type="email" id="loginEmail" name="email" placeholder="Email" required>
+            <input type="password" id="loginPassword" name="password" placeholder="Password" required>
+            <input type="submit" value="Log In">
+        </form>
+        <button class="toggle-button" id="toSignUpBtn">Don't have an account? Sign Up</button>
+    </div>
+
+    <!-- Auth Button -->
+    <div id="authButtonContainer" class="auth-buttons">
+        <button id="authButton" class="auth-button">Log In</button>
+        <button id="logoutButton" class="auth-button hidden">Logout</button>
+    </div>
+</div>
+
+<script>
+    // Get the form containers and buttons
+    var signupForm = document.getElementById("signupForm");
+    var loginForm = document.getElementById("loginForm");
+    var toLoginBtn = document.getElementById("toLoginBtn");
+    var toSignUpBtn = document.getElementById("toSignUpBtn");
+    var authButton = document.getElementById("authButton");
+    var logoutButton = document.getElementById("logoutButton");
+
+    // Show login form and hide signup form
+    toLoginBtn.onclick = function() {
+        signupForm.classList.remove("active");
+        loginForm.classList.add("active");
+    }
+
+    // Show signup form and hide login form
+    toSignUpBtn.onclick = function() {
+        loginForm.classList.remove("active");
+        signupForm.classList.add("active");
+    }
+
+    // Handle login form submission
+    document.getElementById('loginFormContent').onsubmit = async function(event) {
+        event.preventDefault();
+        // Assume successful login for demonstration
+        localStorage.setItem('loggedIn', 'true');
+        authButton.textContent = 'Username'; // Change button text
+        loginForm.classList.remove('active');
+        signupForm.classList.add('hidden');
+        authButton.classList.add('hidden');
+        logoutButton.classList.remove('hidden');
+    };
+
+    // Handle signup form validation
+    document.getElementById('signupFormContent').onsubmit = function(event) {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
+        var terms = document.getElementById('terms').checked;
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
+            event.preventDefault();
+        }
+
+        if (!terms) {
+            alert('You must agree to the terms and conditions!');
+            event.preventDefault();
+        }
+    };
+
+    // Handle logout button click
+    logoutButton.onclick = function() {
+        localStorage.removeItem('loggedIn');
+        authButton.textContent = 'Log In'; // Change button text back
+        authButton.classList.remove('hidden');
+        logoutButton.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        loginForm.classList.add('active');
+        window.location.href = 'signup.html'; // Redirect to signup page
+    };
+
+    // Initial check on page load
+    if (localStorage.getItem('loggedIn') === 'true') {
+        authButton.textContent = 'Username'; // Change button text
+        authButton.classList.add('hidden');
+        logoutButton.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+        loginForm.classList.remove('active');
+    }
+</script>
+
+</body>
+</html>
